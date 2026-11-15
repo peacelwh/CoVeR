@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cover"
+version = "1.0.0"
+description = "CoVeR: Counterfactual-View Reliability learning for LLM-driven incomplete multimodal learning"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+dependencies = ["torch>=2.4", "transformers>=4.57", "peft>=0.17", "numpy", "scikit-learn"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

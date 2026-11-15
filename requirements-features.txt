@@ -1,0 +1,4 @@
+# only for scripts/extract_features.py (IEMOCAP, MELD, MUStARD++); ffmpeg must be on the PATH
+opensmile
+facenet-pytorch
+opencv-python

@@ -1,0 +1,102 @@
+{
+ "mosi": {
+  "kappa": 0.5,
+  "judgments": "single-modality experts (out-of-fold on the training split)",
+  "train": {
+   "consensus": 428,
+   "conflict": 55,
+   "weak_conflict": 297,
+   "other": 504,
+   "samples": 1284
+  },
+  "valid": {
+   "consensus": 92,
+   "conflict": 9,
+   "weak_conflict": 55,
+   "other": 73,
+   "samples": 229
+  },
+  "test": {
+   "consensus": 187,
+   "conflict": 36,
+   "weak_conflict": 186,
+   "other": 277,
+   "samples": 686
+  }
+ },
+ "mosei": {
+  "kappa": 0.5,
+  "judgments": "single-modality experts (out-of-fold on the training split)",
+  "train": {
+   "consensus": 6387,
+   "conflict": 68,
+   "weak_conflict": 675,
+   "other": 9196,
+   "samples": 16326
+  },
+  "valid": {
+   "consensus": 675,
+   "conflict": 4,
+   "weak_conflict": 83,
+   "other": 1109,
+   "samples": 1871
+  },
+  "test": {
+   "consensus": 1669,
+   "conflict": 20,
+   "weak_conflict": 265,
+   "other": 2705,
+   "samples": 4659
+  }
+ },
+ "sims": {
+  "kappa": 0.2,
+  "judgments": "human unimodal labels",
+  "train": {
+   "consensus": 621,
+   "conflict": 105,
+   "weak_conflict": 99,
+   "other": 543,
+   "samples": 1368
+  },
+  "valid": {
+   "consensus": 211,
+   "conflict": 37,
+   "weak_conflict": 38,
+   "other": 170,
+   "samples": 456
+  },
+  "test": {
+   "consensus": 221,
+   "conflict": 31,
+   "weak_conflict": 32,
+   "other": 173,
+   "samples": 457
+  }
+ },
+ "simsv2": {
+  "kappa": 0.2,
+  "judgments": "human unimodal labels",
+  "train": {
+   "consensus": 1423,
+   "conflict": 148,
+   "weak_conflict": 146,
+   "other": 1005,
+   "samples": 2722
+  },
+  "valid": {
+   "consensus": 326,
+   "conflict": 55,
+   "weak_conflict": 42,
+   "other": 224,
+   "samples": 647
+  },
+  "test": {
+   "consensus": 457,
+   "conflict": 73,
+   "weak_conflict": 54,
+   "other": 450,
+   "samples": 1034
+  }
+ }
+}

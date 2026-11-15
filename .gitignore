@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.DS_Store
+
+# source data, features and processed tensors are never committed
+data/raw/
+data/processed/
+data/mrbench_a_permanent/
+
+# outputs
+results/runs/
+results/tables/
+results/figures/
+results/mrbench_h/
+results/mrbench_h.json
+*.pt
+*.npz
+*.log
