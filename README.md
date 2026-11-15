@@ -22,31 +22,6 @@ read. Contrasting the full-input prediction with *counterfactual views* — the 
 content — identifies these language shortcuts. CoVeR trains the views as unimodal judges and withholds fused
 supervision where they disagree; it keeps the architecture and the inference cost of the backbone.
 
-## Repository structure
-
-```
-README.md      this file
-data/          datasets (not distributed), processed tensors, MR-Bench-A annotations, held-out clip lists -> data/README.md
-src/cover/     core code: model, objectives, training, evaluation, benchmarks, diagnosis
-scripts/       preprocessing, training, evaluation, plotting and batch scripts
-results/       outputs: run directories, tables, figures, benchmark predictions          -> results/README.md
-tests/         minimal runnable tests (synthetic data, tiny randomly initialised decoder)
-```
-
-| Module | Content | Paper |
-|---|---|---|
-| `cover/data.py` | availability patterns, dynamic masking, permanent missingness | Sec. 2.1, Sec. 4.1, Supp. E |
-| `cover/model.py` | LLM-Fusion, counterfactual views, disagreement gate | Eqs. 1, 3, 4 |
-| `cover/losses.py` | backbone objective, unimodal-judge loss, CoVeR objective | Eqs. 5, 6 |
-| `cover/train.py`, `cover/recipes.py` | training loop and hyper-parameters | Sec. 4.1, Supp. A |
-| `cover/evaluate.py`, `cover/metrics.py` | seven patterns, missing rates, accuracy / robust mode, metrics | Sec. 4.1, Sec. 4.3 |
-| `cover/experts.py`, `cover/mrbench_a.py` | unimodal experts, case typing, Cons. / Conf. / ShortErr | Sec. 2.1, Sec. 2.2, Supp. B |
-| `cover/mrbench_h.py` | fusion-model predictions and scoring on the 900 clips | Sec. 2.3, Supp. C |
-| `cover/diagnosis.py` | prior-centred reliance, conflict-detection AUROC | Sec. 3.2, Eq. 2 |
-| `cover/steering.py` | discrepancy-gated activation steering (inference-time comparator) | Sec. 3.2, Supp. C |
-| `cover/learned_gate.py` | learned reliability gate (training-time comparator) | Sec. 4.3 |
-| `cover/features.py` | feature extraction for IEMOCAP, MELD and MUStARD++ | Supp. A |
-
 ## Installation
 
 ```bash
