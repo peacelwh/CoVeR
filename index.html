@@ -412,7 +412,7 @@ footer a{color:var(--ink-2)}
       <h3>The CoVeR objective</h3>
       <div class="eq"><span class="n">Eq. 5</span>𝓛<sub>uni</sub> = (1 / Σ<sub><i>i,j</i></sub> <i>m<sub>ij</sub></i>) Σ<sub><i>i</i></sub> Σ<sub><i>j</i></sub> <i>m<sub>ij</sub></i> ℓ( <i>ŷ<sub>i</sub></i><sup>(<i>j</i>)</sup>, <i>y<sub>i</sub></i><sup>(<i>j</i>)</sup> )</div>
       <div class="eq"><span class="n">Eq. 6</span>𝓛 = <i>λ</i><sub>task</sub> [ ℓ(<i>ỹ</i>, <i>y</i>) + <i>λ</i><sub>uni</sub> 𝓛<sub>uni</sub> ] + <i>λ</i><sub>con</sub> 𝓛<sub>con</sub> + <i>λ</i><sub>reg</sub> 𝓛<sub>reg</sub></div>
-      <div class="prose"><p style="font-size:16.5px;margin:10px 0 0">If no judge disagrees, the fused path is trained as usual; if a judge disagrees, <i>ỹ</i> is a constant and the fused path receives no task gradient from that sample, whereas all views keep their unimodal supervision. At test time, <b>accuracy mode</b> outputs <i>ŷ</i> of the full view in one forward pass with the parameters and the cost of LLM-Fusion; the optional <b>robust mode</b> applies the gate with trained judges.</p></div>
+      <div class="prose"><p style="font-size:16.5px;margin:10px 0 0">If no judge disagrees, the fused path is trained as usual; if a judge disagrees, <i>ỹ</i> is a constant and the fused path receives no task gradient from that sample, whereas all views keep their unimodal supervision. At test time, <b>accuracy mode</b> outputs <i>ŷ</i> of the full view in one forward pass with the architecture and the inference cost of LLM-Fusion; the optional <b>robust mode</b> applies the gate with trained judges.</p></div>
     </div>
   </div>
 </section>
