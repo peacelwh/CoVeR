@@ -1,12 +1,17 @@
-# Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning
+<h1 align="center">Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning</h1>
 
-Wenhao Li<sup>1,2</sup>, Chong Xiao<sup>1</sup>, Xiaokun Bai<sup>1</sup>, Rundong He<sup>3</sup>,
-Zhuang Qi<sup>4</sup>, Xusheng Liang<sup>5,2</sup>, Zhibin Wu<sup>1</sup>, Qiangchang Wang<sup>1</sup>
+<p align="center">
+  Wenhao Li<sup>1,2</sup>, Chong Xiao<sup>1</sup>, Xiaokun Bai<sup>1</sup>, Rundong He<sup>3</sup>, Zhuang Qi<sup>4</sup>, Xusheng Liang<sup>5,2</sup>, Zhibin Wu<sup>1</sup>, Qiangchang Wang<sup>1</sup>
+  <br>
+  <sup>1</sup>Shandong University &nbsp; <sup>2</sup>Shenzhen Loop Area Institute &nbsp; <sup>3</sup>The Hong Kong Polytechnic University &nbsp; <sup>4</sup>National University of Singapore &nbsp; <sup>5</sup>City University of Hong Kong
+</p>
 
-<sup>1</sup>Shandong University, <sup>2</sup>Shenzhen Loop Area Institute, <sup>3</sup>The Hong Kong Polytechnic University,
-<sup>4</sup>National University of Singapore, <sup>5</sup>City University of Hong Kong
-
-[Project page](https://peacelwh.github.io/CoVeR/) | [MR-Bench-H dataset](https://huggingface.co/datasets/Bluexxx/MR-Bench-H) | [Checkpoints](https://huggingface.co/Bluexxx/CoVeR)
+<p align="center">
+  <a href="https://peacelwh.github.io/CoVeR/"><img src="https://img.shields.io/badge/Project-CoVeR-9cf" alt="Project page: CoVeR"></a>
+  <a href="https://huggingface.co/datasets/Bluexxx/MR-Bench-H"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-MR--Bench--H-dfb317" alt="Dataset: MR-Bench-H"></a>
+  <a href="https://huggingface.co/Bluexxx/CoVeR"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Checkpoints-CoVeR-dfb317" alt="Checkpoints: CoVeR"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-97ca00" alt="License: MIT"></a>
+</p>
 
 Code for **CoVeR** (Counterfactual-View Reliability learning), its backbone **LLM-Fusion**, and the evaluation on
 **MR-Bench** (MR-Bench-A and MR-Bench-H).
