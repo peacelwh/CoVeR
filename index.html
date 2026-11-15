@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Words Speak Louder? CoVeR and MR-Bench</title>
+<meta name="description" content="Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning. MR-Bench, a benchmark of modality-conflict cases, and CoVeR, Counterfactual-View Reliability learning.">
+<meta property="og:title" content="Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning">
+<meta property="og:description" content="Is a face or a voice still heard once the words are known? MR-Bench and CoVeR.">
+<meta property="og:image" content="assets/teaser.jpg">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@87..110,400..900&family=Source+Serif+4:opsz,wght@8..60,400..600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3f4f7; --paper-2:#e9ebf0; --surface:#fff; --surface-2:#f7f8fa;
+  --ink:#12141c; --ink-2:#444a5b; --ink-3:#737a8e; --rule:#dadde6; --rule-2:#c3c8d4;
+  --accent:#4a3aa7; --accent-ink:#3a2c8c; --accent-wash:#eeebfa;
+  --c-text:#2a78d6; --c-audio:#eb6834; --c-vis:#1baf7a; --c-base:#8a8a8a; --c-mllm:#6e7fa3;
+  --good:#1e7b34; --bad:#c0392b;
+  --shadow:0 1px 2px rgba(40,48,80,.06),0 8px 24px rgba(40,48,80,.07);
+  --sans:"Archivo",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --col:720px;
+}
+:root[data-theme="dark"]{
+  --paper:#0f1117; --paper-2:#171a23; --surface:#181b25; --surface-2:#1f2330;
+  --ink:#eceef4; --ink-2:#b4bacb; --ink-3:#8389a0; --rule:#2a2f3f; --rule-2:#3a4056;
+  --accent:#9b8cf0; --accent-ink:#b6aaf6; --accent-wash:#241f45;
+  --c-text:#5a9dea; --c-audio:#f08a5d; --c-vis:#3fcf9a; --c-base:#9a9da8; --c-mllm:#8c9cc0;
+  --good:#5bc47a; --bad:#ec7063;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--accent-ink)}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:var(--col);margin:0 auto;padding:0 20px}
+.wide{max-width:1040px;margin:0 auto;padding:0 20px}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+.bar.scrolled{border-color:var(--rule)}
+.bar-in{max-width:var(--col);margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800;letter-spacing:-.01em;margin-right:auto;min-width:0}
+.brand-mark{width:30px;height:30px;flex:none}
+.hero-mark{width:56px;height:56px;margin:0 0 18px;filter:drop-shadow(0 6px 14px rgba(74,58,167,.28))}
+.brand-sub{display:block;font-weight:500;font-size:12px;color:var(--ink-3);line-height:1.1}
+.brand-name{display:block;font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--rule);background:var(--surface);cursor:pointer;font-weight:650;font-size:14px;text-decoration:none;color:var(--ink);box-shadow:0 1px 1px rgba(20,24,40,.04)}
+.pill:hover{border-color:var(--rule-2)}
+.pill.dark{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pill.icon{width:36px;padding:0;justify-content:center}
+.menu{position:relative}
+.menu-list{position:absolute;right:0;top:44px;width:260px;background:var(--surface);border:1px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);padding:8px;display:none}
+.menu.open .menu-list{display:block}
+.menu-list a{display:flex;gap:12px;align-items:baseline;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:600;font-size:14px}
+.menu-list a:hover{background:var(--surface-2)}
+.menu-list a.on{background:var(--accent-wash);color:var(--accent-ink)}
+.menu-list a span{font-variant-numeric:tabular-nums;color:var(--ink-3);font-size:12px;font-weight:600;width:18px}
+
+/* hero */
+.hero{padding:36px 0 8px;background:radial-gradient(900px 380px at 80% -10%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 70%)}
+.eyebrow{font-size:13px;font-weight:650;color:var(--ink-3);letter-spacing:.01em}
+.eyebrow b{color:var(--accent-ink);font-weight:750}
+h1{font-size:clamp(46px,11vw,92px);line-height:.92;font-weight:900;letter-spacing:-.045em;font-stretch:96%;margin:14px 0 16px}
+.tag{font-size:clamp(19px,3.6vw,24px);font-weight:750;line-height:1.18;letter-spacing:-.015em;max-width:560px;margin:0 0 18px}
+.authors{font-size:15px;color:var(--ink-2);font-weight:550;line-height:1.55;margin:0 0 4px}
+.authors sup,.affil sup{font-size:.68em;color:var(--ink-3)}
+.affil{font-size:13px;color:var(--ink-3);line-height:1.55;margin:0 0 14px}
+.logos{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 20px;background:#fff;border:1px solid var(--rule);border-radius:16px;padding:14px 18px;margin:0 0 22px}
+.logos img{height:var(--h);width:auto;max-width:none;flex:none}
+@media (max-width:720px){.logos{justify-content:center;gap:16px 26px}}
+.ic{width:17px;height:17px;fill:currentColor;flex:none}
+.emo{font-size:17px;line-height:1;flex:none}
+.cta{display:flex;align-items:center;gap:12px;min-height:52px;line-height:1.2;border-radius:999px;background:var(--accent);color:#fff;text-decoration:none;font-weight:750;padding:8px 22px 8px 8px;box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 35%,transparent)}
+:root[data-theme="dark"] .cta{color:#14102e}
+.cta i{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-style:normal}
+.cta small{margin-left:auto;font-weight:600;opacity:.85;font-size:13px;white-space:nowrap}
+.links{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0 0}
+.links .pill{justify-content:center;height:44px}
+.links .pill[aria-disabled="true"]{color:var(--ink-3);cursor:default;border-style:dashed;box-shadow:none}
+@media (max-width:560px){.links{grid-template-columns:repeat(2,1fr)}}
+.figure{margin:28px 0 0}
+.figure .frame{background:var(--surface);border:1px solid var(--rule);border-radius:20px;box-shadow:var(--shadow);padding:14px;overflow:hidden}
+.figure .frame img{border-radius:10px;width:100%}
+:root[data-theme="dark"] .figure .frame.keep-light{background:#fff}
+figcaption,.cap{font-family:var(--serif);font-size:14.5px;color:var(--ink-2);line-height:1.5;margin-top:12px}
+.src{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:650;color:var(--ink-3);border:1px solid var(--rule);border-radius:999px;padding:2px 10px;margin-top:10px}
+
+/* sections */
+section{padding:56px 0 8px}
+.kicker{font-size:13px;font-weight:750;color:var(--accent-ink);margin:0 0 8px}
+h2{font-size:clamp(30px,6vw,44px);line-height:1.02;font-weight:900;letter-spacing:-.035em;margin:0 0 16px}
+h3{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0 0 6px}
+.lede,.prose p{font-family:var(--serif);font-size:18px;line-height:1.58;color:var(--ink-2);margin:0 0 14px}
+.prose p b,.lede b{color:var(--ink);font-weight:600}
+.position{border-left:3px solid var(--accent);padding:2px 0 2px 18px;margin:8px 0 0}
+.position h2{font-size:clamp(24px,4.6vw,32px);letter-spacing:-.025em;margin-bottom:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:26px 0 0;border-top:1px solid var(--rule);padding-top:20px}
+.stat b{display:block;font-size:clamp(30px,6.4vw,42px);font-weight:900;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{display:block;font-size:13px;color:var(--ink-3);font-weight:550;margin-top:8px;line-height:1.35}
+@media (max-width:560px){.stats{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin:22px 0 0}
+.card-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;margin-bottom:14px}
+.card-title{font-weight:800;letter-spacing:-.01em}
+.note{font-size:13px;color:var(--ink-3);line-height:1.45;margin:12px 0 0}
+.seg{display:inline-flex;background:var(--paper-2);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;height:30px;padding:0 12px;border-radius:999px;font-weight:650;font-size:13px;cursor:pointer;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(20,24,40,.12)}
+.switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;font-size:14px;border:0;background:none;padding:0}
+.switch i{width:44px;height:26px;border-radius:999px;background:var(--rule-2);position:relative;transition:background .2s;flex:none}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.switch[aria-pressed="true"] i{background:var(--c-text)}
+.switch[aria-pressed="true"] i::after{transform:translateX(18px)}
+
+/* bars */
+.rows{display:grid;gap:9px}
+.row{display:grid;grid-template-columns:minmax(120px,190px) 1fr 52px;gap:10px;align-items:center;font-size:13.5px}
+.row .lab{font-weight:650;line-height:1.2}
+.row .lab small{display:block;font-weight:550;color:var(--ink-3);font-size:11.5px}
+.track{position:relative;height:18px;background:var(--paper-2);border-radius:6px}
+.fill{position:absolute;inset:0 auto 0 0;border-radius:6px;background:var(--c-mllm);transition:width .55s cubic-bezier(.2,.7,.2,1)}
+.fill.ours{background:var(--accent)} .fill.base{background:var(--c-base)} .fill.vis{background:var(--c-vis)} .fill.text{background:var(--c-text)}
+.ghost{position:absolute;inset:0 auto 0 0;border:1.5px dashed var(--c-vis);border-radius:6px;opacity:0;transition:opacity .3s}
+.val{font-variant-numeric:tabular-nums;font-weight:750;text-align:right}
+.ref{position:absolute;top:-5px;bottom:-5px;width:0;border-left:1.5px dashed var(--ink-3);pointer-events:none}
+.ref.dot{border-left-style:dotted;border-color:var(--ink-2)}
+.group{font-size:12px;font-weight:750;color:var(--ink-3);letter-spacing:.02em;margin:14px 0 2px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-2);margin-top:14px;font-weight:550}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.legend u{display:inline-block;width:14px;border-top:1.5px dashed var(--ink-3);margin-right:6px;vertical-align:3px;text-decoration:none}
+.delta{font-weight:800;color:var(--bad);font-variant-numeric:tabular-nums;opacity:0;transition:opacity .3s}
+.on .delta,.on .ghost{opacity:1}
+
+/* stepper */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.steps button{border:1px solid var(--rule);background:var(--surface-2);border-radius:14px;padding:12px;text-align:left;cursor:pointer}
+.steps button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-wash)}
+.steps b{display:block;font-size:26px;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.steps span{font-size:12.5px;font-weight:650;color:var(--ink-2)}
+.steps em{font-style:normal;font-size:11.5px;font-weight:750;color:var(--accent-ink)}
+.split{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{font-size:12.5px;font-weight:650;border-radius:999px;padding:4px 10px;background:var(--paper-2);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.chip.ls{background:color-mix(in srgb,var(--c-text) 16%,transparent);color:var(--c-text)}
+.chip.ns{background:color-mix(in srgb,var(--c-vis) 18%,transparent);color:var(--c-vis)}
+.stack{display:flex;height:18px;border-radius:6px;overflow:hidden;background:var(--paper-2)}
+.stack i{display:block;height:100%}
+.stack .ls{background:var(--c-text)} .stack .ns{background:var(--c-vis)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.tbl th{font-size:12px;color:var(--ink-3);font-weight:700;text-align:right;padding:6px 8px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:7px 8px;border-bottom:1px solid var(--rule);text-align:right}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr.ours td{background:var(--accent-wash);font-weight:750}
+.tbl tr.sep td{border-top:1.5px solid var(--rule-2)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.three{grid-template-columns:1fr}.row{grid-template-columns:1fr 46px;row-gap:3px}.row .lab{grid-column:1/-1}.row .lab small{display:inline;margin-left:6px}.card{padding:16px}.links .pill{font-size:13px;padding:0 8px}}
+.mini{background:var(--surface-2);border:1px solid var(--rule);border-radius:14px;padding:14px}
+.mini b{font-size:24px;font-weight:900;letter-spacing:-.03em;display:block;font-variant-numeric:tabular-nums}
+.mini span{font-size:12.5px;color:var(--ink-2);line-height:1.4;display:block;margin-top:4px}
+
+/* method */
+.eq{font-family:var(--serif);font-size:17px;background:var(--surface-2);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;overflow-x:auto;white-space:nowrap;margin:10px 0}
+.eq i{font-style:italic} .eq sub,.eq sup{font-size:.7em}
+.eq .n{float:right;color:var(--ink-3);font-family:var(--sans);font-size:12px;font-weight:650;margin-left:16px}
+.play{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:640px){.play{grid-template-columns:1fr}}
+.sl{display:grid;grid-template-columns:86px 1fr 44px;gap:10px;align-items:center;font-size:13.5px;font-weight:650;margin:9px 0}
+.sl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:750}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.axis{position:relative;height:74px;margin:8px 0 2px;border-radius:12px;background:linear-gradient(90deg,color-mix(in srgb,var(--bad) 12%,transparent),transparent 49.8%,var(--rule-2) 49.8%,var(--rule-2) 50.2%,transparent 50.2%,color-mix(in srgb,var(--good) 14%,transparent))}
+.axis .band{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--ink-3) 22%,transparent) 5px 6px)}
+.mk{position:absolute;top:8px;transform:translateX(-50%);font-size:11px;font-weight:800;text-align:center;transition:left .15s}
+.mk i{display:block;width:14px;height:14px;border-radius:50%;margin:0 auto 2px;border:2px solid var(--surface)}
+.mk.t i{background:var(--c-text)} .mk.a i{background:var(--c-audio)} .mk.v i{background:var(--c-vis)}
+.mk.f{top:40px} .mk.f i{background:var(--ink-3);border-radius:3px} .mk.g{top:40px} .mk.g i{background:var(--accent);border-radius:3px}
+.axis-l{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-3);font-weight:650}
+.verdict{border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45;font-weight:600;margin-top:12px;background:var(--surface-2);border:1px solid var(--rule)}
+.verdict.fire{background:var(--accent-wash);border-color:var(--accent)}
+.verdict b{font-weight:850}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.tabs button{border:1px solid var(--rule);background:var(--surface-2);border-radius:12px;padding:10px;font-weight:750;font-size:13.5px;cursor:pointer}
+.tabs button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-wash);color:var(--accent-ink)}
+.tabpane{font-family:var(--serif);font-size:16.5px;line-height:1.55;color:var(--ink-2);margin:14px 2px 0}
+pre{background:var(--surface-2);border:1px solid var(--rule);border-radius:14px;padding:16px;overflow-x:auto;font-size:13px;line-height:1.5;margin:0}
+footer{margin:64px 0 0;border-top:1px solid var(--rule);padding:26px 0 48px;font-size:13px;color:var(--ink-3);line-height:1.6}
+footer a{color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="bar" id="bar">
+  <div class="bar-in">
+    <a class="brand" href="#top" aria-label="Back to top">
+      <img class="brand-mark" src="assets/icon.svg" width="30" height="30" alt="">
+      <span style="min-width:0"><span class="brand-name">Words Speak Louder?</span><span class="brand-sub">CoVeR and MR-Bench</span></span>
+    </a>
+    <button class="pill icon" id="theme" aria-label="Switch between light and dark theme" title="Theme">◐</button>
+    <div class="menu" id="menu">
+      <button class="pill dark" id="menu-btn" aria-expanded="false" aria-controls="menu-list">☰ Chapters</button>
+      <nav class="menu-list" id="menu-list" aria-label="Chapters"></nav>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="top" data-ch="Overview">
+  <div class="wrap">
+    <img class="hero-mark" src="assets/icon.svg" width="56" height="56" alt="Icon: a speech bubble in which the text bar is louder than the audio and visual bars">
+    <div class="eyebrow"><b>Paper</b> · 2026</div>
+    <h1>Words Speak Louder?</h1>
+    <p class="tag">Exploring the language shortcut of LLM-driven incomplete multimodal learning</p>
+    <p class="authors">Wenhao Li<sup>1,2</sup>, Chong Xiao<sup>1</sup>, Xiaokun Bai<sup>1</sup>, Rundong He<sup>3</sup>, Zhuang Qi<sup>4</sup>, Xusheng Liang<sup>5,2</sup>, Zhibin Wu<sup>1</sup>, Qiangchang Wang<sup>1</sup></p>
+    <p class="affil"><sup>1</sup>Shandong University · <sup>2</sup>Shenzhen Loop Area Institute · <sup>3</sup>The Hong Kong Polytechnic University · <sup>4</sup>National University of Singapore · <sup>5</sup>City University of Hong Kong</p>
+    <div class="logos" role="group" aria-label="Institutions">
+      <img src="assets/logos/sdu.png" width="616" height="194" style="--h:38px" alt="Shandong University">
+      <img src="assets/logos/slai.png" width="760" height="121" style="--h:23px" alt="Shenzhen Loop Area Institute">
+      <img src="assets/logos/polyu.png" width="1002" height="192" style="--h:27px" alt="The Hong Kong Polytechnic University">
+      <img src="assets/logos/nus.png" width="300" height="137" style="--h:38px" alt="National University of Singapore">
+      <img src="assets/logos/cityu.png" width="198" height="112" style="--h:40px" alt="City University of Hong Kong">
+    </div>
+    <a class="cta" href="#words"><i>↓</i> See the shortcut in three models <small>Fig. S2</small></a>
+    <div class="links">
+      <span class="pill" aria-disabled="true" title="The arXiv link will be added here"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 0A1.5 1.5 0 0 0 2 1.5v13A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5V4.4a1.5 1.5 0 0 0-.44-1.06L10.66.44A1.5 1.5 0 0 0 9.6 0H3.5Zm1.25 7h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1 0-1.5Zm0 3h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1 0-1.5Zm0-6h3a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5Z"/></svg>Paper · arXiv soon</span>
+      <a class="pill" href="https://github.com/peacelwh/CoVeR"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Code</a>
+      <a class="pill" href="https://huggingface.co/datasets/Bluexxx/MR-Bench-H"><span class="emo" aria-hidden="true">🤗</span>Dataset</a>
+      <a class="pill" href="https://huggingface.co/Bluexxx/CoVeR"><span class="emo" aria-hidden="true">🤗</span>Checkpoints</a>
+    </div>
+  </div>
+  <div class="wide">
+    <figure class="figure">
+      <div class="frame keep-light"><img src="assets/teaser.jpg" width="2138" height="1321" alt="Six language-shortcut clips of MR-Bench-H from CMU-MOSI, CMU-MOSEI, CH-SIMS, MUStARD++, MELD and CH-SIMS v2, each with the answers of a vision-language model on the muted video and on the video with its transcript, of an audio-visual MLLM, and of LLM-Fusion."></div>
+      <figcaption class="wrap" style="padding:0"><b>Language-shortcut clips from MR-Bench-H on which current models follow the words.</b> Every model is asked whether the speaker's sentiment is positive or negative: a vision–language model that answers correctly from the muted video switches to the polarity of the words once the transcript is added, and an audio-visual MLLM and the fusion backbone LLM-Fusion (trained on the four MMSA sources only) follow the words as well.<br><span class="src">Figure 1 in the paper</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="position" data-ch="Position">
+  <div class="wrap">
+    <div class="position">
+      <p class="kicker">Position</p>
+      <h2>Is a face or a voice still heard once the words are known?</h2>
+      <p class="lede">Incomplete multimodal learning increasingly uses large language models as fusion engines: modality features enter as token blocks and missing modalities become placeholders. We find that <b>LLM-driven fusion can override non-verbal evidence it can read</b>. Contrasting its full-input prediction with <i>counterfactual views</i>, the same model shown one modality or no content, we identify language shortcuts.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b data-count="32.7" data-suffix="%">32.7%</b><span>of the 620 language-shortcut clips solved by the strongest zero-shot MLLM</span></div>
+      <div class="stat"><b>46.1–53.1</b><span>points of vision–language accuracy lost when the transcript is added to the muted video</span></div>
+      <div class="stat"><b data-count="94.4" data-suffix="%">94.4%</b><span>solved by inverting a text-only model's answers, so LS accuracy alone cannot establish use of non-verbal evidence</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="words" data-ch="Models follow the words">
+  <div class="wrap">
+    <p class="kicker">The problem</p>
+    <h2>Models follow the words</h2>
+    <div class="prose"><p>The muted video shows that the evidence is visible: three vision–language models solve <b>61.1–68.9%</b> of the language-shortcut clips from the muted video alone, and <b>13.2–21.6%</b> once the transcript is added.</p></div>
+    <div class="card" id="paired">
+      <div class="card-head">
+        <span class="card-title">The same 620 LS clips, two views</span>
+        <button class="switch" id="tr" aria-pressed="false"><i></i>Add the transcript</button>
+      </div>
+      <div class="rows" id="paired-rows"></div>
+      <div class="legend"><span><i style="background:var(--c-vis)"></i>muted video</span><span><i style="background:var(--c-text)"></i>video + transcript</span><span><u></u>chance</span></div>
+      <p class="note">LS accuracy (%). Accuracy falls by 47.9, 46.1 and 53.1 points for Qwen2.5-VL, InternVL3 and LLaVA-OV, respectively.</p>
+      <span class="src">Figure S2 in the paper</span>
+    </div>
+    <div class="prose" style="margin-top:22px"><p>Zero-shot MLLMs solve <b>5.5–32.7%</b> of the LS clips, all far below chance, although they solve <b>89.6–99.3%</b> of the NS clips, whose words carry the label. ShortErr, the share of LS clips answered with the misleading polarity of the words, is <b>66.9–94.4%</b>.</p></div>
+  </div>
+</section>
+
+<section id="bench" data-ch="MR-Bench">
+  <div class="wrap">
+    <p class="kicker">The benchmark</p>
+    <h2>MR-Bench: finding modality-conflict cases</h2>
+    <div class="prose">
+      <p>We call inputs on which the fused prediction follows the words while the non-verbal evidence and the label say otherwise <b>language-shortcut cases</b>, and find them without relying on the model under study, through unimodal judgments: human labels of what each modality conveys on its own, or out-of-fold single-modality experts.</p>
+      <p><b>MR-Bench-A</b> types every test sample of CMU-MOSI, CMU-MOSEI, CH-SIMS and CH-SIMSv2 by its unimodal judgments. <b>MR-Bench-H</b> contains 900 human-validated clips (620 language-shortcut, LS; 280 non-verbal-shortcut, NS) from seven sources, and every model is scored on all of them.</p>
+    </div>
+  </div>
+  <div class="wide">
+    <figure class="figure">
+      <div class="frame keep-light"><img src="assets/pipeline.png" width="2664" height="1780" loading="lazy" alt="Construction of MR-Bench in three steps: mining 2,040 candidates whose unimodal judgments disagree with the words, screening with a panel of four text-only LLMs (1,337 pass), and blind human validation by three annotators (900 clips)."></div>
+      <figcaption class="wrap" style="padding:0"><b>Constructing MR-Bench.</b> Candidates are clips whose unimodal judgments disagree with the words; a panel of four text-only LLMs keeps an LS candidate only if the majority misreads its transcript, and three annotators keep a clip only if the majority recovers the label from the full clip and the misleading polarity from the shortcut channel.<br><span class="src">Figure 2 in the paper</span></figcaption>
+    </figure>
+  </div>
+  <div class="wrap">
+    <div class="card">
+      <div class="card-head"><span class="card-title">Three steps to 900 clips</span><span class="note" style="margin:0">Tap a step</span></div>
+      <div class="steps" id="steps"></div>
+      <p class="tabpane" id="step-text"></p>
+      <div class="split" id="step-split"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">MR-Bench-H per source</span><span class="legend" style="margin:0"><span><i style="background:var(--c-text)"></i>LS 620</span><span><i style="background:var(--c-vis)"></i>NS 280</span></span></div>
+      <div class="rows" id="comp"></div>
+      <p class="note">Each clip asks one deliberately simple question, “Is the overall sentiment expressed by the speaker positive or negative?”, so that a failure cannot be attributed to the difficulty of the task. Annotator agreement is Fleiss' κ = 0.75.</p>
+      <span class="src">Table S4 in the paper</span>
+    </div>
+  </div>
+</section>
+
+<section id="survey" data-ch="Benchmark results">
+  <div class="wrap">
+    <p class="kicker">Benchmark results</p>
+    <h2>Every model is scored on all 900 clips</h2>
+    <div class="card" id="bh">
+      <div class="card-head">
+        <span class="card-title" id="bh-title">LS accuracy on the 620 LS clips</span>
+        <div class="seg" id="bh-seg" role="group" aria-label="Metric">
+          <button data-k="ls" aria-pressed="true">LS accuracy</button><button data-k="ns" aria-pressed="false">NS accuracy</button><button data-k="se" aria-pressed="false">LS ShortErr</button>
+        </div>
+      </div>
+      <div id="bh-rows"></div>
+      <div class="legend"><span><i style="background:var(--c-mllm)"></i>zero-shot MLLM</span><span><i style="background:var(--c-base)"></i>fusion model</span><span><i style="background:var(--accent)"></i>CoVeR</span><span id="bh-leg"></span></div>
+      <p class="note">T: transcript, A: audio, V: video. Fusion models are trained on the training split of each source and averaged over three seeds; they inherit its label prior, so they are compared within their family.</p>
+      <span class="src">Figure 3 and Table S5 in the paper</span>
+    </div>
+    <div class="card">
+      <h3>LS accuracy alone is insufficient</h3>
+      <div class="prose"><p style="font-size:16.5px;margin:0">The text-only model solves 34 of the 620 LS clips (5.5%); reversing its answers solves <b>94.4%</b> of them without audio or video, but only <b>0.7%</b> of the NS clips. LS accuracy alone therefore cannot prove the use of non-verbal evidence: we read it together with NS accuracy and with paired views of the same model.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="diagnosis" data-ch="Where the decision collapses">
+  <div class="wrap">
+    <p class="kicker">Systematic failures of LLM-driven fusion</p>
+    <h2>The model fails exactly where the modalities disagree</h2>
+    <div class="prose"><p>With all modalities observed, LLM-Fusion is right on <b>90–98%</b> of the consensus cases but only on <b>17–59%</b> of the conflict cases of MR-Bench-A, and 41–83% of its predictions on these cases follow the polarity of the text. The failure is not a lack of evidence: the <i>same</i> model, evaluated without text, solves <b>63–87%</b> of the conflict cases.</p></div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">MR-Bench-A and the conflict patterns of LLM-Fusion</span></div>
+      <div class="scroll"><table class="tbl" id="tA"></table></div>
+      <p class="note">Test-split consensus (Cons.) and conflict (Conf.) counts and, with all modalities observed, Acc2 on both case types, ShortErr (SE) and conflict Acc2 of the same model without text (w/o t) and of its visual-only view, in %; mean over 3 seeds.</p>
+      <span class="src">Table S3 in the paper</span>
+    </div>
+  </div>
+  <div class="wide">
+    <figure class="figure">
+      <div class="frame keep-light"><img src="assets/diag.png" width="1485" height="350" loading="lazy" alt="Prior-centred reliance of the fused state on the text-, audio- and visual-only views across the decoder layers on CMU-MOSI, CH-SIMS and CH-SIMSv2, and AUROC for separating conflict from consensus cases."></div>
+      <figcaption class="wrap" style="padding:0"><b>Where and how the decision collapses.</b> (a–c) Prior-centred reliance of the fused state on the text-, audio- and visual-only views across the decoder layers of LLM-Fusion, on conflict (solid) and consensus (dashed) cases. (d) AUROC for separating conflict from consensus cases with the hidden-state discrepancy and with the prediction-level disagreement between the audio/visual and the text views.<br><span class="src">Figure 4 in the paper</span></figcaption>
+    </figure>
+  </div>
+  <div class="wrap">
+    <div class="three" style="margin-top:22px">
+      <div class="mini"><b>0.68–0.81</b><span><b style="display:inline;font-size:inherit;letter-spacing:0">Collapse forms late.</b> Text reliance averages 0.49–0.63 over the first two thirds of the decoder and rises to 0.68–0.81 in the last third.</span></div>
+      <div class="mini"><b>0.53–0.60</b><span><b style="display:inline;font-size:inherit;letter-spacing:0">State discrepancy is a weak signal.</b> It separates conflict from consensus cases hardly better than chance (AUROC on CMU-MOSI, CMU-MOSEI and CH-SIMS).</span></div>
+      <div class="mini"><b>up to 0.92</b><span><b style="display:inline;font-size:inherit;letter-spacing:0">Prediction disagreement is useful.</b> The disagreement between the views' predictions separates the two case types with an AUROC of up to 0.92.</span></div>
+    </div>
+    <div class="prose" style="margin-top:22px"><p>A larger language model does not solve the problem: with five decoder-only LLMs from 0.5B to 1.7B parameters on CH-SIMS, every backbone still follows the text on 53–65% of the conflict cases, although it solves 63–73% of them once the text is removed.</p></div>
+  </div>
+</section>
+
+<section id="method" data-ch="CoVeR">
+  <div class="wrap">
+    <p class="kicker">Counterfactual-View Reliability learning</p>
+    <h2>CoVeR: views as trained judges</h2>
+    <div class="prose"><p>The prediction-level disagreement of counterfactual views provides a direct signal of conflicting evidence. CoVeR keeps the architecture, the inputs and the inference procedure of LLM-driven fusion unchanged and modifies only how it is trained: the views are trained as <b>unimodal judges</b>, and their disagreement decides which samples supervise the fused path.</p></div>
+  </div>
+  <div class="wide">
+    <figure class="figure">
+      <div class="frame keep-light"><img src="assets/overview.png" width="4017" height="1070" loading="lazy" alt="Three ways to fuse: LLM-Fusion supervises the fused prediction on every sample; the test-time override lets confidently disagreeing views of the frozen model replace the fused decision; CoVeR trains the views as unimodal judges and withholds the fused task loss wherever a judge disagrees with the text judge."></div>
+      <figcaption class="wrap" style="padding:0"><span class="src">Figure 5 in the paper</span></figcaption>
+    </figure>
+  </div>
+  <div class="wrap">
+    <div class="tabs" id="ways" role="group" aria-label="Three ways to fuse"></div>
+    <p class="tabpane" id="way-text"></p>
+
+    <div class="card">
+      <div class="card-head"><span class="card-title">The disagreement gate</span><span class="note" style="margin:0">Move the sliders</span></div>
+      <div class="eq"><span class="n">Eq. 3</span><i>g<sub>j</sub></i> = 𝟙[ sgn(<i>ŷ</i><sup>(<i>j</i>)</sup> − <i>c</i>) ≠ sgn(<i>ŷ</i><sup>(<i>t</i>)</sup> − <i>c</i>) ] · 𝟙[ |<i>ŷ</i><sup>(<i>j</i>)</sup> − <i>c</i>| ≥ <i>τ</i>/2 ]</div>
+      <div class="eq"><span class="n">Eq. 4</span><i>ỹ</i> = <i>ŷ</i> + Σ<sub><i>j</i></sub> <i>w<sub>j</sub></i> ( sg[<i>ŷ</i><sup>(<i>j</i>)</sup>] − <i>ŷ</i> ),  <i>w<sub>j</sub></i> = <i>m<sub>j</sub> g<sub>j</sub></i> / max(1, Σ<sub><i>k</i></sub> <i>m<sub>k</sub> g<sub>k</sub></i>)</div>
+      <div class="play">
+        <div>
+          <div class="sl"><label for="s-t" style="color:var(--c-text)">text view</label><input id="s-t" type="range" min="0" max="1" step="0.01" value="0.82"><output id="o-t"></output></div>
+          <div class="sl"><label for="s-a" style="color:var(--c-audio)">audio view</label><input id="s-a" type="range" min="0" max="1" step="0.01" value="0.24"><output id="o-a"></output></div>
+          <div class="sl"><label for="s-v" style="color:var(--c-vis)">visual view</label><input id="s-v" type="range" min="0" max="1" step="0.01" value="0.41"><output id="o-v"></output></div>
+          <div class="sl"><label for="s-f">fused <i>ŷ</i></label><input id="s-f" type="range" min="0" max="1" step="0.01" value="0.74"><output id="o-f"></output></div>
+          <div class="sl"><label for="s-tau">margin <i>τ</i></label><input id="s-tau" type="range" min="0.1" max="0.5" step="0.1" value="0.4"><output id="o-tau"></output></div>
+        </div>
+        <div>
+          <div class="axis" id="axis"><div class="band" id="band"></div>
+            <div class="mk t" id="m-t"><i></i>t</div><div class="mk a" id="m-a"><i></i>a</div><div class="mk v" id="m-v"><i></i>v</div>
+            <div class="mk f" id="m-f"><i></i>ŷ</div><div class="mk g" id="m-g"><i></i>ỹ</div>
+          </div>
+          <div class="axis-l"><span>0 negative</span><span>c = 0.5</span><span>positive 1</span></div>
+          <div class="verdict" id="verdict"></div>
+        </div>
+      </div>
+      <p class="note">Labels are normalised to [0, 1], so the neutral point is <i>c</i> = 0.5; the hatched band is the margin <i>τ</i>/2 around it. A non-text view confidently disagrees if it has the opposite polarity of the text view and lies outside the band.</p>
+    </div>
+
+    <div class="card">
+      <h3>The CoVeR objective</h3>
+      <div class="eq"><span class="n">Eq. 5</span>𝓛<sub>uni</sub> = (1 / Σ<sub><i>i,j</i></sub> <i>m<sub>ij</sub></i>) Σ<sub><i>i</i></sub> Σ<sub><i>j</i></sub> <i>m<sub>ij</sub></i> ℓ( <i>ŷ<sub>i</sub></i><sup>(<i>j</i>)</sup>, <i>y<sub>i</sub></i><sup>(<i>j</i>)</sup> )</div>
+      <div class="eq"><span class="n">Eq. 6</span>𝓛 = <i>λ</i><sub>task</sub> [ ℓ(<i>ỹ</i>, <i>y</i>) + <i>λ</i><sub>uni</sub> 𝓛<sub>uni</sub> ] + <i>λ</i><sub>con</sub> 𝓛<sub>con</sub> + <i>λ</i><sub>reg</sub> 𝓛<sub>reg</sub></div>
+      <div class="prose"><p style="font-size:16.5px;margin:10px 0 0">If no judge disagrees, the fused path is trained as usual; if a judge disagrees, <i>ỹ</i> is a constant and the fused path receives no task gradient from that sample, whereas all views keep their unimodal supervision. At test time, <b>accuracy mode</b> outputs <i>ŷ</i> of the full view in one forward pass with the parameters and the cost of LLM-Fusion; the optional <b>robust mode</b> applies the gate with trained judges.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="results" data-ch="Results">
+  <div class="wrap">
+    <p class="kicker">Results</p>
+    <h2>State-of-the-art results on five benchmarks</h2>
+    <div class="prose"><p>CoVeR achieves the best Acc2, F1 and correlation and the lowest MAE on all four MMSA benchmarks and on IEMOCAP against nine incomplete multimodal learning methods re-run under one protocol, although, like LLM-Fusion, it never reads the features of a missing modality.</p></div>
+    <div class="card" id="sota">
+      <div class="card-head">
+        <div class="seg" id="sota-ds" role="group" aria-label="Benchmark"></div>
+        <div class="seg" id="sota-m" role="group" aria-label="Metric"></div>
+      </div>
+      <div class="rows" id="sota-rows"></div>
+      <p class="note" id="sota-note"></p>
+      <span class="src" id="sota-src"></span>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-title">Correcting the collapse on MR-Bench-A</span><div class="seg" id="t1-ds" role="group" aria-label="Dataset"></div></div>
+      <div class="scroll"><table class="tbl" id="t1"></table></div>
+      <p class="note">Avg Corr (×100), Acc2 on consensus (Cons.) and conflict (Conf.) cases and ShortErr (SE), in %. Mean over 5 seeds. Fixed-threshold discrepancy steering barely changes ShortErr; test-time override trades consensus accuracy for conflict accuracy.</p>
+      <span class="src">Table 1 in the paper</span>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-title">Supervision ablation on CH-SIMS</span><div class="seg" id="ab-m" role="group" aria-label="Metric"></div></div>
+      <div class="rows" id="ab-rows"></div>
+      <p class="note">Unimodal supervision without the gate improves Avg Corr by 2.6 points and conflict accuracy by 2.6 points over LLM-Fusion. Adding the disagreement gate gains a further 2.9 Corr points and 6.4 conflict points.</p>
+      <span class="src">Table 3 in the paper</span>
+    </div>
+
+    <div class="three" style="margin-top:22px">
+      <div class="mini"><b>61.7 / 93.6</b><span>LS / NS accuracy (%) of CoVeR in accuracy mode on MR-Bench-H, versus 58.8 / 93.1 for LLM-Fusion.</span></div>
+      <div class="mini"><b>63.0 / 84.8</b><span>LS / NS accuracy (%) in robust mode, leaving a trade-off between the two shortcut types.</span></div>
+      <div class="mini"><b>32.2 → 30.1</b><span>Among LS clips solved from audio and video alone, the share (%) that adding the text makes wrong: LLM-Fusion → CoVeR.</span></div>
+    </div>
+    <div class="prose" style="margin-top:22px"><p><b>Collapse and cost.</b> CoVeR weakens the collapse: the late-layer text reliance on conflict cases drops from 0.81 to 0.74 (CMU-MOSI) and 0.77 to 0.72 (CH-SIMS). Accuracy-mode inference costs the same as LLM-Fusion (4.0 ms per clip on an RTX 4090); a training epoch takes 5.7× as long and robust mode 6× the latency.</p>
+    <p><b>Limitations.</b> The CMU-MOSI/MOSEI conflict sets of MR-Bench-A are model-judged and small, MR-Bench-H holds only model-detectable shortcuts, and CoVeR needs unimodal labels and a known dominant modality.</p></div>
+  </div>
+</section>
+
+<section id="cite" data-ch="Cite">
+  <div class="wrap">
+    <p class="kicker">Cite</p>
+    <h2>BibTeX</h2>
+    <pre id="bib">@article{li2026words,
+  title  = {Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning},
+  author = {Li, Wenhao and Xiao, Chong and Bai, Xiaokun and He, Rundong and Qi, Zhuang and Liang, Xusheng and Wu, Zhibin and Wang, Qiangchang},
+  year   = {2026}
+}</pre>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+      <button class="pill" id="copy">Copy BibTeX</button>
+      <a class="pill" href="https://github.com/peacelwh/CoVeR"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Code</a>
+      <a class="pill" href="https://huggingface.co/datasets/Bluexxx/MR-Bench-H"><span class="emo" aria-hidden="true">🤗</span>MR-Bench-H</a>
+      <a class="pill" href="https://huggingface.co/Bluexxx/CoVeR"><span class="emo" aria-hidden="true">🤗</span>Checkpoints</a>
+    </div>
+    <footer>
+      MR-Bench adds derived annotations keyed by the original sample identifiers and inherits the licences and annotation biases of its sources. The diagnosis tools are intended for auditing models; we do not recommend deploying affect recognition in high-stakes decisions about individuals.<br>
+      Code: MIT. MR-Bench-H annotations: CC BY-NC 4.0. Page layout inspired by the project page of <a href="https://trinity-rsi.github.io/">The Trinity</a>.
+    </footer>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+function el(tag,cls,html){var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e}
+function seg(root,items,cur,cb){root.innerHTML=""; items.forEach(function(it){var b=el("button",null,it[1]); b.setAttribute("aria-pressed",String(it[0]===cur)); b.onclick=function(){$$("button",root).forEach(function(x){x.setAttribute("aria-pressed","false")}); b.setAttribute("aria-pressed","true"); cb(it[0])}; root.appendChild(b)})}
+
+/* theme */
+var root=document.documentElement;
+try{var saved=localStorage.getItem("theme"); if(saved){root.setAttribute("data-theme",saved)} else if(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches){root.setAttribute("data-theme","dark")}}catch(e){}
+$("#theme").onclick=function(){var t=root.getAttribute("data-theme")==="dark"?"light":"dark"; root.setAttribute("data-theme",t); try{localStorage.setItem("theme",t)}catch(e){}};
+
+/* chapters menu */
+var menu=$("#menu"), list=$("#menu-list"), secs=$$("section[data-ch]");
+secs.forEach(function(s,i){var a=el("a",null,"<span>"+(i<10?"0":"")+i+"</span>"+s.dataset.ch); a.href="#"+s.id; a.onclick=function(){menu.classList.remove("open"); $("#menu-btn").setAttribute("aria-expanded","false")}; list.appendChild(a)});
+$("#menu-btn").onclick=function(e){e.stopPropagation(); var o=menu.classList.toggle("open"); this.setAttribute("aria-expanded",String(o))};
+document.addEventListener("click",function(e){if(!menu.contains(e.target)){menu.classList.remove("open"); $("#menu-btn").setAttribute("aria-expanded","false")}});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){menu.classList.remove("open")}});
+function onScroll(){$("#bar").classList.toggle("scrolled",window.scrollY>8); var y=window.scrollY+120, cur=0; secs.forEach(function(s,i){if(s.offsetTop<=y)cur=i}); $$("a",list).forEach(function(a,i){a.classList.toggle("on",i===cur)})}
+window.addEventListener("scroll",onScroll,{passive:true}); onScroll();
+
+/* animated counters */
+if("IntersectionObserver" in window && !(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(!en.isIntersecting)return; io.unobserve(en.target); var b=en.target, to=parseFloat(b.dataset.count), suf=b.dataset.suffix||"", t0=null;
+    function step(t){if(!t0)t0=t; var p=Math.min(1,(t-t0)/900), v=to*(1-Math.pow(1-p,3)); b.textContent=v.toFixed(1)+suf; if(p<1)requestAnimationFrame(step)} requestAnimationFrame(step)})},{threshold:.6});
+  $$("[data-count]").forEach(function(b){io.observe(b)});
+}
+
+/* paired views (Fig. S2) */
+var PAIRED=[["Qwen2.5-VL",61.1,13.2,47.9],["InternVL3",67.7,21.6,46.1],["LLaVA-OV",68.9,15.8,53.1]];
+var pr=$("#paired-rows");
+PAIRED.forEach(function(p){var r=el("div","row"); r.innerHTML='<div class="lab">'+p[0]+'<small class="delta">−'+p[3].toFixed(1)+' points</small></div><div class="track"><div class="ref" style="left:50%"></div><div class="ghost" style="width:'+p[1]+'%"></div><div class="fill vis" style="width:'+p[1]+'%"></div></div><div class="val">'+p[1].toFixed(1)+'</div>'; pr.appendChild(r)});
+$("#tr").onclick=function(){var on=this.getAttribute("aria-pressed")!=="true"; this.setAttribute("aria-pressed",String(on)); $("#paired").classList.toggle("on",on);
+  $$(".row",pr).forEach(function(r,i){var f=$(".fill",r), v=on?PAIRED[i][2]:PAIRED[i][1]; f.style.width=v+"%"; f.className="fill "+(on?"text":"vis"); $(".val",r).textContent=v.toFixed(1)})};
+
+/* construction steps */
+var STEPS=[
+ ["2,040","candidates","Step 1 · mining","<b>Mining</b> candidates from the unimodal judgments of MR-Bench-A, the explicit vs. implicit emotion annotations of MUStARD++ and, for MELD and IEMOCAP, the text-only view of a trained fusion model.",[["ls","LS 1,474"],["ns","NS 380"],["","controls 186"]]],
+ ["1,337","pass the panel","Step 2 · screening","<b>Screening</b> by a panel of four text-only LLMs from three families (Qwen2.5-7B, Qwen3-8B, Yi-1.5-9B, Phi-3.5-mini), which keeps an LS candidate only if the majority misreads its transcript and an NS candidate or control only if the majority reads the label from the words.",[["ls","LS 798"],["ns","NS 363"],["","controls 176"]]],
+ ["900","validated clips","Step 3 · validation","<b>Blind human validation</b> by three annotators, who judge each clip from the transcript, the muted video and the full clip, in this order. Control clips are excluded from the release.",[["ls","LS 620"],["ns","NS 280"]]]];
+var stepsEl=$("#steps");
+function showStep(i){$$("button",stepsEl).forEach(function(b,k){b.setAttribute("aria-pressed",String(k===i))}); $("#step-text").innerHTML=STEPS[i][3]; var sp=$("#step-split"); sp.innerHTML=""; STEPS[i][4].forEach(function(c){sp.appendChild(el("span","chip "+c[0],c[1]))})}
+STEPS.forEach(function(s,i){var b=el("button",null,"<em>"+s[2]+"</em><b>"+s[0]+"</b><span>"+s[1]+"</span>"); b.onclick=function(){showStep(i)}; stepsEl.appendChild(b)}); showStep(0);
+
+/* composition (Tab. S4) */
+var COMP=[["CMU-MOSI","EN",14,119],["CMU-MOSEI","EN",23,119],["CH-SIMS","ZH",24,16],["CH-SIMSv2","ZH",49,26],["MUStARD++","EN",53,0],["MELD","EN",176,0],["IEMOCAP","EN",281,0]];
+COMP.forEach(function(c){var r=el("div","row"), t=c[2]+c[3]; r.innerHTML='<div class="lab">'+c[0]+'<small>'+c[1]+' · LS '+c[2]+(c[3]?' · NS '+c[3]:'')+'</small></div><div class="stack" style="width:'+(100*t/281)+'%;min-width:8px"><i class="ls" style="width:'+(100*c[2]/t)+'%"></i><i class="ns" style="width:'+(100*c[3]/t)+'%"></i></div><div class="val">'+t+'</div>'; $("#comp").appendChild(r)});
+
+/* benchmark results (Fig. 3, Tab. S5): [name, input, LS, NS, SE, class] */
+var BH={mllm:[["Qwen2-Audio-7B","A",32.7,90.4,66.9],["MiniCPM-o 2.6","V+A",30.2,89.6,69.7],["Qwen2.5-Omni-7B","V+A",28.7,94.6,71.3],["Qwen2.5-Omni-3B","V+A",25.8,92.5,74.2],["InternVL3-8B","V+T",21.6,98.9,77.6],["LLaVA-OV-7B","V+T",15.8,98.2,83.4],["Qwen2.5-VL-7B","V+T",13.2,99.3,86.0],["Qwen2.5-7B","T",5.5,99.3,94.4]],
+ fusion:[["CoVeR, robust","t,a,v",63.0,84.8,37.0,"ours"],["CoVeR, accuracy","t,a,v",61.7,93.6,38.3,"ours"],["MMIN","t,a,v",60.7,91.9,39.3,"base"],["MulT","t,a,v",60.4,91.3,39.6,"base"],["MoMKE","t,a,v",59.4,90.2,40.6,"base"],["LLM-Fusion","t,a,v",58.8,93.1,41.2,"base"]]};
+var BHK={ls:[2,"LS accuracy on the 620 LS clips",61.9,true],ns:[3,"NS accuracy on the 280 NS clips",83.6,false],se:[4,"LS ShortErr: LS clips answered with the misleading polarity of the words",38.1,false]};
+function drawBH(k){var cfg=BHK[k], box=$("#bh-rows"); box.innerHTML=""; $("#bh-title").textContent=cfg[1];
+  [["zero-shot MLLMs",BH.mllm],["fusion models (mean of three seeds)",BH.fusion]].forEach(function(g){box.appendChild(el("div","group",g[0])); var rows=el("div","rows");
+    g[1].forEach(function(m){var v=m[cfg[0]], r=el("div","row"); r.innerHTML='<div class="lab">'+m[0]+'<small>'+m[1]+'</small></div><div class="track">'+(cfg[3]?'<div class="ref" style="left:50%"></div>':'')+'<div class="ref dot" style="left:'+cfg[2]+'%"></div><div class="fill '+(m[5]||"")+'" style="width:0%"></div></div><div class="val">'+v.toFixed(1)+'</div>'; rows.appendChild(r); requestAnimationFrame(function(){requestAnimationFrame(function(){$(".fill",r).style.width=v+"%"})})});
+    box.appendChild(rows)});
+  $("#bh-leg").innerHTML=(cfg[3]?'<u></u>chance &nbsp; ':'')+'<u style="border-top-style:dotted;border-color:var(--ink-2)"></u>always “negative” ('+cfg[2]+'%)'}
+$$("#bh-seg button").forEach(function(b){b.onclick=function(){$$("#bh-seg button").forEach(function(x){x.setAttribute("aria-pressed","false")}); b.setAttribute("aria-pressed","true"); drawBH(b.dataset.k)}}); drawBH("ls");
+
+/* MR-Bench-A (Tab. S3) */
+$("#tA").innerHTML='<tr><th>Dataset</th><th>Judgments</th><th>#Cons.</th><th>#Conf.</th><th>Cons. ↑</th><th>Conf. ↑</th><th>SE ↓</th><th>w/o t ↑</th><th>by visual view ↑</th></tr>'+
+ [["CMU-MOSI","OOF experts",187,36,94.7,22.2,77.8,63.0,54.6],["CMU-MOSEI","OOF experts",1669,20,97.8,16.7,83.3,86.7,78.3],["CH-SIMS","human",221,31,89.6,38.7,61.3,68.8,69.9],["CH-SIMSv2","human",457,73,93.7,59.4,40.6,83.1,84.0]].map(function(r){return "<tr>"+r.map(function(c,i){return "<td>"+(i>3?c.toFixed(1):c)+"</td>"}).join("")+"</tr>"}).join("");
+
+/* three ways to fuse (Fig. 5) */
+var WAYS=[["LLM-Fusion","<b>LLM-Fusion</b> supervises the fused prediction on every sample."],["Test-time override","The <b>test-time override</b> lets confidently disagreeing views of the frozen model replace the fused decision. It needs no training and one extra batched pass over the views; a smaller margin raises conflict accuracy but lowers consensus accuracy and correlation, because untrained views remain imperfect judges."],["CoVeR","<b>CoVeR</b> trains the views as unimodal judges and withholds the fused task loss wherever a judge disagrees with the text judge, running the full view alone at test time."]];
+var waysEl=$("#ways");
+function showWay(i){$$("button",waysEl).forEach(function(b,k){b.setAttribute("aria-pressed",String(k===i))}); $("#way-text").innerHTML=WAYS[i][1]}
+WAYS.forEach(function(w,i){var b=el("button",null,w[0]); b.onclick=function(){showWay(i)}; waysEl.appendChild(b)}); showWay(2);
+
+/* gate playground (Eqs. 3, 4) */
+function gate(){var c=.5, t=+$("#s-t").value, a=+$("#s-a").value, v=+$("#s-v").value, f=+$("#s-f").value, tau=+$("#s-tau").value;
+  function g(y){return ((y-c)*(t-c)<0 && Math.abs(y-c)>=tau/2)?1:0}
+  var ga=g(a), gv=g(v), n=Math.max(1,ga+gv), wa=ga/n, wv=gv/n, yt=f+wa*(a-f)+wv*(v-f);
+  [["t",t],["a",a],["v",v],["f",f],["tau",tau]].forEach(function(p){$("#o-"+p[0]).textContent=p[1].toFixed(p[0]==="tau"?1:2)});
+  [["t",t],["a",a],["v",v],["f",f],["g",yt]].forEach(function(p){$("#m-"+p[0]).style.left=(100*p[1])+"%"});
+  var band=$("#band"); band.style.left=(100*(c-tau/2))+"%"; band.style.width=(100*tau)+"%";
+  var ver=$("#verdict"), who=[ga?"audio":null,gv?"visual":null].filter(Boolean);
+  ver.classList.toggle("fire",who.length>0);
+  ver.innerHTML=who.length? "<b>The "+who.join(" and ")+" judge"+(who.length>1?"s":"")+" confidently disagree"+(who.length>1?"":"s")+" with the text judge.</b> <i>ỹ</i> = "+yt.toFixed(2)+" is the mean of the disagreeing views' predictions, a constant: the fused path receives no task gradient from this sample."
+    : "<b>No judge confidently disagrees.</b> <i>ỹ</i> = <i>ŷ</i> = "+yt.toFixed(2)+": the fused path is trained as usual."}
+$$("#s-t,#s-a,#s-v,#s-f,#s-tau").forEach(function(s){s.oninput=gate}); gate();
+
+/* comparison with the state of the art (Tab. 2, Tab. S11): Acc2, F1, MAE, Corr */
+var M=["MulT","MISA","MMIN","TFR-Net","IMDer","DiCMoR","MoMKE","LNLN","MPLMM","LLM-Fusion","CoVeR (ours)"], VEN=["ACL'19","MM'20","ACL'21","MM'21","NeurIPS'23","ICCV'23","MM'24","NeurIPS'24","ACL'24","",""];
+var SOTA={"CMU-MOSI":[[68.6,65.5,1.160,.521],[67.0,65.4,1.166,.479],[67.7,67.0,1.205,.504],[67.6,63.8,1.140,.501],[68.3,65.9,1.151,.506],[67.2,65.6,1.207,.511],[65.2,62.8,1.200,.474],[66.2,64.0,1.182,.477],[68.5,67.7,1.143,.520],[67.7,66.9,1.127,.504],[69.1,68.9,1.119,.533]],
+ "CMU-MOSEI":[[73.9,68.9,.706,.532],[74.4,72.8,.702,.549],[76.3,74.8,.690,.574],[73.1,67.0,.696,.515],[75.2,70.7,.675,.567],[75.8,73.8,.676,.564],[75.7,75.2,.683,.574],[73.8,73.5,.703,.543],[74.8,72.6,.688,.567],[76.2,75.5,.676,.587],[77.0,76.2,.659,.603]],
+ "CH-SIMS":[[72.6,69.6,.510,.414],[72.6,68.7,.520,.463],[74.6,74.4,.502,.508],[73.7,71.3,.508,.462],[75.3,72.4,.495,.478],[76.3,75.0,.502,.522],[73.0,71.1,.511,.446],[76.7,74.8,.479,.526],[72.7,72.3,.495,.500],[73.8,73.1,.484,.496],[77.2,76.1,.469,.530]],
+ "CH-SIMSv2":[[73.8,71.5,.393,.534],[73.6,72.7,.397,.550],[75.2,74.3,.388,.577],[74.6,73.5,.382,.565],[75.7,75.3,.371,.581],[75.8,75.6,.389,.593],[74.9,74.8,.385,.579],[75.1,74.1,.382,.572],[75.1,73.8,.380,.581],[75.5,75.4,.366,.593],[76.9,76.7,.357,.615]],
+ "IEMOCAP":[[77.9,75.8,.616,.556],[80.2,77.9,.599,.602],[80.9,80.6,.626,.627],[77.9,76.7,.612,.562],[79.2,78.9,.579,.606],[80.1,79.6,.580,.615],[80.2,79.9,.585,.615],[78.0,77.7,.608,.594],[78.8,78.7,.588,.604],[82.3,82.4,.538,.671],[82.6,82.6,.534,.681]]};
+var MET=[["Acc2 ↑",1],["F1 ↑",1],["MAE ↓",3],["Corr ↑",3]], sds="CMU-MOSI", sm=3;
+function drawSOTA(){var d=SOTA[sds], col=d.map(function(r){return r[sm]}), lo=Math.min.apply(null,col), hi=Math.max.apply(null,col), pad=(hi-lo)*.35||1, box=$("#sota-rows"); box.innerHTML="";
+  d.forEach(function(r,i){var v=r[sm], w=100*(v-(lo-pad))/((hi+pad)-(lo-pad)), row=el("div","row"); row.innerHTML='<div class="lab">'+M[i]+(VEN[i]?'<small>'+VEN[i]+'</small>':'')+'</div><div class="track"><div class="fill '+(i===10?"ours":i===9?"base":"")+'" style="width:'+w.toFixed(1)+'%"></div></div><div class="val">'+v.toFixed(MET[sm][1])+'</div>'; box.appendChild(row)});
+  var c=d[10], b=d[9], dl=c[sm]-b[sm];
+  $("#sota-note").innerHTML="Averaged over the seven test-time availability patterns; mean over 3 seeds. CoVeR vs. LLM-Fusion: "+(dl>0?"+":"−")+Math.abs(dl).toFixed(MET[sm][1])+" "+MET[sm][0].split(" ")[0]+" (difference of displayed means)."+(sm===2?" Lower is better.":"")+" Bars are scaled to the range of the column.";
+  $("#sota-src").textContent=sds==="IEMOCAP"?"Table S11 in the paper":"Table 2 in the paper"}
+seg($("#sota-ds"),Object.keys(SOTA).map(function(k){return [k,k]}),sds,function(k){sds=k; drawSOTA()});
+seg($("#sota-m"),MET.map(function(m,i){return [i,m[0]]}),sm,function(k){sm=k; drawSOTA()}); drawSOTA();
+
+/* correcting the collapse (Tab. 1) */
+var T1=[["LLM-Fusion",[50.7,94.1,21.7,78.3],[59.2,93.7,58.6,41.4]],["+ discrepancy-gated steering",[50.3,93.8,22.2,77.8],[58.9,93.6,58.6,41.4]],["+ test-time override (τ<sub>test</sub> = 0.3)",[47.8,92.5,33.9,66.1],[55.3,86.8,72.3,27.7]],["+ learned reliability gate",[50.1,92.5,19.4,80.6],[58.6,93.1,56.4,43.6]],["+ conflict re-weighting",[50.4,93.6,24.4,75.6],[58.1,93.0,52.3,47.7]],["+ unimodal multi-task (𝓛<sub>uni</sub>)",[52.2,95.7,24.4,75.6],[61.3,93.9,55.6,44.4]],["CoVeR, accuracy mode",[53.5,95.2,28.3,71.7],[61.2,93.7,59.5,40.5]],["CoVeR, robust mode (τ<sub>test</sub> = 0.3)",[51.9,95.3,31.1,68.9],[57.4,87.6,69.9,30.1]]];
+function drawT1(k){$("#t1").innerHTML='<tr><th>Method</th><th>Corr ↑</th><th>Cons. ↑</th><th>Conf. ↑</th><th>SE ↓</th></tr>'+T1.map(function(r,i){return '<tr class="'+(i>=6?"ours":"")+(i===6?" sep":"")+'"><td>'+r[0]+'</td>'+r[k+1].map(function(v){return "<td>"+v.toFixed(1)+"</td>"}).join("")+'</tr>'}).join("")}
+seg($("#t1-ds"),[[0,"CMU-MOSI"],[1,"CH-SIMSv2"]],0,drawT1); drawT1(0);
+
+/* ablation (Tab. 3) */
+var AB=[["LLM-Fusion",49.6,38.7,61.3,"base"],["+ unimodal loss, no gate",52.2,41.3,58.7,""],["+ unimodal loss + gate (CoVeR)",55.1,47.7,52.3,"ours"]];
+function drawAB(k){var box=$("#ab-rows"); box.innerHTML=""; AB.forEach(function(a){var v=a[k], r=el("div","row"); r.innerHTML='<div class="lab">'+a[0]+'</div><div class="track"><div class="fill '+a[4]+'" style="width:'+v+'%"></div></div><div class="val">'+v.toFixed(1)+'</div>'; box.appendChild(r)})}
+seg($("#ab-m"),[[1,"Avg Corr ×100 ↑"],[2,"Conf. ↑"],[3,"SE ↓"]],1,drawAB); drawAB(1);
+
+/* copy BibTeX */
+$("#copy").onclick=function(){var b=this, t=$("#bib").textContent; function ok(){b.textContent="Copied"; setTimeout(function(){b.textContent="Copy BibTeX"},1400)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){})}else{var r=document.createRange(); r.selectNode($("#bib")); var s=getSelection(); s.removeAllRanges(); s.addRange(r); try{document.execCommand("copy"); ok()}catch(e){}}};
+})();
+</script>
+</body>
+</html>
