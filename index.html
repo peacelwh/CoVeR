@@ -308,6 +308,12 @@ footer a{color:var(--ink-2)}
       <p class="note">Each clip asks one deliberately simple question, “Is the overall sentiment expressed by the speaker positive or negative?”, so that a failure cannot be attributed to the difficulty of the task. Annotator agreement is Fleiss' κ = 0.75.</p>
       <span class="src">Table S4 in the paper</span>
     </div>
+    <h3 id="samples" style="margin:34px 0 8px">Sample clips</h3>
+    <div class="prose"><p>Twelve clips of MR-Bench-H with their transcripts, labels, shortcut polarities and the recorded answers of four zero-shot readers. They are not hand-picked for the outcome: for each source and type we take the first clips of a seeded random order that show the speaker clearly. On the LS clips the text reader follows the words, the vision–language model often reads the muted video correctly and loses this answer once the transcript is added; on the NS clips the words carry the label and the muted video alone is the unreliable view.</p></div>
+    <figure class="figure" style="margin-top:16px">
+      <div class="frame keep-light"><img src="assets/samples.jpg" width="2000" height="2464" loading="lazy" alt="Twelve sample clips of MR-Bench-H: eight language-shortcut clips from CMU-MOSI, CMU-MOSEI, CH-SIMS, CH-SIMSv2, MUStARD++ and MELD and four non-verbal-shortcut clips from CMU-MOSI, CMU-MOSEI, CH-SIMS and CH-SIMSv2, each with three frames, its transcript, label, shortcut polarity and the answers of four zero-shot readers."></div>
+      <figcaption><b>Sample clips of MR-Bench-H</b> (frames at 20/50/80% of each clip; Chinese transcripts with an English gloss). LS: the words suggest the polarity opposite to the label; NS: the face does. Marks show whether a reader answers the label: Qwen2.5-7B on the transcript (T), InternVL3-8B on the muted video (V) and on the video with its transcript (V+T), Qwen2.5-Omni-7B on the full clip (V+A). IEMOCAP clips are part of the benchmark but are not reproduced here because of its redistribution terms.<br><span class="src">Figure S1 in the paper</span></figcaption>
+    </figure>
   </div>
 </section>
 
