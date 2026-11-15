@@ -1,9 +1,9 @@
 <h1 align="center">Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning</h1>
 
 <p align="center">
-  Wenhao Li<sup>1,2</sup>, Chong Xiao<sup>1</sup>, Xiaokun Bai<sup>1</sup>, Rundong He<sup>3</sup>, Zhuang Qi<sup>4</sup>, Xusheng Liang<sup>5,2</sup>, Zhibin Wu<sup>1</sup>, Qiangchang Wang<sup>1</sup>
+  Wenhao&nbsp;Li<sup>1,2</sup>, Chong&nbsp;Xiao<sup>1</sup>, Xiaokun&nbsp;Bai<sup>1</sup>, Rundong&nbsp;He<sup>3</sup>, Zhuang&nbsp;Qi<sup>4</sup>, Xusheng&nbsp;Liang<sup>5,2</sup>, Zhibin&nbsp;Wu<sup>1</sup>, Qiangchang&nbsp;Wang<sup>1</sup>
   <br>
-  <sup>1</sup>Shandong University &nbsp; <sup>2</sup>Shenzhen Loop Area Institute &nbsp; <sup>3</sup>The Hong Kong Polytechnic University &nbsp; <sup>4</sup>National University of Singapore &nbsp; <sup>5</sup>City University of Hong Kong
+  <sup>1</sup>Shandong&nbsp;University &ensp; <sup>2</sup>Shenzhen&nbsp;Loop&nbsp;Area&nbsp;Institute &ensp; <sup>3</sup>The&nbsp;Hong&nbsp;Kong&nbsp;Polytechnic&nbsp;University &ensp; <sup>4</sup>National&nbsp;University&nbsp;of&nbsp;Singapore &ensp; <sup>5</sup>City&nbsp;University&nbsp;of&nbsp;Hong&nbsp;Kong
 </p>
 
 <p align="center">
