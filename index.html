@@ -24,7 +24,7 @@
   --shadow:0 1px 2px rgba(40,48,80,.06),0 8px 24px rgba(40,48,80,.07);
   --sans:"Archivo",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
-  --col:720px;
+  --col:920px;
 }
 :root[data-theme="dark"]{
   --paper:#0f1117; --paper-2:#171a23; --surface:#181b25; --surface-2:#1f2330;
@@ -42,7 +42,7 @@ img{max-width:100%;height:auto;display:block}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 .wrap{max-width:var(--col);margin:0 auto;padding:0 20px}
-.wide{max-width:1040px;margin:0 auto;padding:0 20px}
+.wide{max-width:var(--col);margin:0 auto;padding:0 20px}
 
 /* top bar */
 .bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
@@ -70,7 +70,7 @@ button{font:inherit;color:inherit}
 .eyebrow{font-size:13px;font-weight:650;color:var(--ink-3);letter-spacing:.01em}
 .eyebrow b{color:var(--accent-ink);font-weight:750}
 h1{font-size:clamp(46px,11vw,92px);line-height:.92;font-weight:900;letter-spacing:-.045em;font-stretch:96%;margin:14px 0 16px}
-.tag{font-size:clamp(19px,3.6vw,24px);font-weight:750;line-height:1.18;letter-spacing:-.015em;max-width:560px;margin:0 0 18px}
+.tag{font-size:clamp(19px,3.6vw,24px);font-weight:750;line-height:1.18;letter-spacing:-.015em;max-width:none;margin:0 0 18px}
 .authors{font-size:15px;color:var(--ink-2);font-weight:550;line-height:1.55;margin:0 0 4px}
 .authors sup,.affil sup{font-size:.68em;color:var(--ink-3)}
 .affil{font-size:13px;color:var(--ink-3);line-height:1.55;margin:0 0 14px}
