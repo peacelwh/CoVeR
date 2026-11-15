@@ -107,8 +107,8 @@ content-free view `(0, m)`. All views share one token layout and run in one batc
    stopped gradient) otherwise; the task loss is put on `ỹ` (Eq. 6), so the fused path receives no task gradient from
    a sample on which a judge disagrees, whereas all views keep their unimodal supervision.
 
-**Inference.** *Accuracy mode* outputs `ŷ` of the full view in one forward pass, with the parameters and the cost of
-LLM-Fusion (all main results). The optional *robust mode* applies Eqs. (3, 4) with a test-time margin `τ_test`. Applied
+**Inference.** *Accuracy mode* outputs `ŷ` of the full view in one forward pass, with the architecture and the
+inference cost of LLM-Fusion (all main results). The optional *robust mode* applies Eqs. (3, 4) with a test-time margin `τ_test`. Applied
 to a trained LLM-Fusion, the same rule is the training-free *test-time override*.
 
 ## Training and evaluation
@@ -161,9 +161,10 @@ The paper reports means over three seeds; these checkpoints are the runs of seed
 
 Shared by LLM-Fusion and CoVeR: Qwen3-0.6B with LoRA on the attention projections, `K = 4` fusion tokens,
 `λ_task = 10`, `λ_con = λ_reg = 1`, AdamW with a cosine schedule, batch 32, bf16 and activation checkpointing,
-30 epochs (15 on CMU-MOSEI, 20 on IEMOCAP). Hyper-parameters are selected per dataset on the validation split only
-(`τ ∈ {0.2, 0.3, 0.4}`, `λ_uni ∈ {0.5, 1, 2}`, rank `r ∈ {16, 32}`, then learning rate, epochs and weight averaging).
-The values are in [`src/cover/recipes.py`](src/cover/recipes.py):
+and a default budget of 30 epochs (15 on CMU-MOSEI, 20 on IEMOCAP). Hyper-parameters are selected per dataset on the
+validation split only (`τ ∈ {0.2, 0.3, 0.4}`, `λ_uni ∈ {0.5, 1, 2}`, rank `r ∈ {16, 32}`, then learning rate, epochs and
+weight averaging); LLM-Fusion receives the same search. The selected values of both methods are in
+[`src/cover/recipes.py`](src/cover/recipes.py):
 
 | CoVeR, `--recipe selected` | CMU-MOSI | CMU-MOSEI | CH-SIMS | CH-SIMSv2 | IEMOCAP |
 |---|---|---|---|---|---|
@@ -173,6 +174,13 @@ The values are in [`src/cover/recipes.py`](src/cover/recipes.py):
 | learning rate | 2e-4 | 2e-4 | 2e-4 | 2e-4 | 2e-4 |
 | weight averaging (decay) | 0.99 | 0.99 | 0.99 | – | 0.99 |
 | epochs | 30 | 15 | 30 | 30 | 20 |
+
+| LLM-Fusion, `--recipe selected` | CMU-MOSI | CMU-MOSEI | CH-SIMS | CH-SIMSv2 | IEMOCAP |
+|---|---|---|---|---|---|
+| LoRA rank | 32 | 32 | 16 | 16 | 32 |
+| learning rate | 2e-4 | 2e-4 | 1e-4 | 1e-4 | 2e-4 |
+| weight averaging (decay) | 0.99 | 0.99 | 0.99 | 0.99 | 0.99 |
+| epochs | 30 | 15 | 50 | 30 | 20 |
 
 `--recipe default` is the default recipe of the backbone for every row of the analyses (rank 16, lr 2e-4, no weight
 averaging; CoVeR: `τ = 0.3`, `λ_uni = 1`). Every hyper-parameter can be overridden on the command line

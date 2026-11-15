@@ -2,14 +2,15 @@
 
 Shared by LLM-Fusion and CoVeR: Qwen3-0.6B with LoRA on the attention projections, K = 4 fusion tokens, T = 50 tokens
 per modality, lambda_task = 10, lambda_con = lambda_reg = 1, AdamW with a cosine schedule, batch 32, bf16 and
-activation checkpointing, 30 epochs (15 on CMU-MOSEI) on one 24 GB GPU.
+activation checkpointing, a default budget of 30 epochs (15 on CMU-MOSEI) on one 24 GB GPU.
 
 Two recipes are provided for each method:
 
 ``selected``  per-dataset hyper-parameters chosen on the validation split only (comparisons with the state of the
               art, IEMOCAP, MR-Bench-H and permanent missingness). CoVeR: tau = 0.4, lambda_uni = 2, the MSE loss and
               lr 2e-4 everywhere, rank 16 except on CH-SIMS (32), weight averaging (decay 0.99) except on CH-SIMSv2;
-              CMU-MOSEI reuses the CMU-MOSI setting. LLM-Fusion receives the same search.
+              CMU-MOSEI reuses the CMU-MOSI setting. LLM-Fusion receives the same search (rank, learning rate,
+              epochs and weight averaging); its selected values are listed in ``SELECTED`` below.
 ``default``   the default recipe of the backbone for every row of the analyses (test-time override, comparison of
               corrections, ablation): rank 16, lr 2e-4, no weight averaging; CoVeR uses tau = 0.3, lambda_uni = 1.
 """

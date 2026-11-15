@@ -4,7 +4,7 @@ Acc2, weighted F1, MAE and Pearson correlation are reported per pattern and aver
 over the missing rates r in {0.1, ..., 0.7} (Rate); the MR-Bench-A metrics use all modalities observed.
 
 Inference modes of a trained model (Sec. 4.3):
-    ``accuracy``  the prediction of the full view in one forward pass (parameters and cost of LLM-Fusion)
+    ``accuracy``  the prediction of the full view in one forward pass (architecture and inference cost of LLM-Fusion)
     ``robust``    the gated prediction of Eqs. (3, 4) with a test-time margin tau: disagreeing views override the
                   fused decision. Applied to a trained LLM-Fusion this is the test-time override of Sec. 4.2.
 """
