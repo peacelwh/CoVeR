@@ -137,35 +137,6 @@ python scripts/score_mrbench_h.py --items MR-Bench-H/data/test.jsonl --pred "res
 
 The paper reports means over three seeds; these checkpoints are the runs of seed 42.
 
-### Hyper-parameters
-
-Shared by LLM-Fusion and CoVeR: Qwen3-0.6B with LoRA on the attention projections, `K = 4` fusion tokens,
-`λ_task = 10`, `λ_con = λ_reg = 1`, AdamW with a cosine schedule, batch 32, bf16 and activation checkpointing,
-and a default budget of 30 epochs (15 on CMU-MOSEI, 20 on IEMOCAP). Hyper-parameters are selected per dataset on the
-validation split only (`τ ∈ {0.2, 0.3, 0.4}`, `λ_uni ∈ {0.5, 1, 2}`, rank `r ∈ {16, 32}`, then learning rate, epochs and
-weight averaging); LLM-Fusion receives the same search. The selected values of both methods are in
-[`src/cover/recipes.py`](src/cover/recipes.py):
-
-| CoVeR, `--recipe selected` | CMU-MOSI | CMU-MOSEI | CH-SIMS | CH-SIMSv2 | IEMOCAP |
-|---|---|---|---|---|---|
-| margin `τ` (labels in [0, 1], `c = 0.5`) | 0.4 | 0.4 | 0.4 | 0.4 | 0.4 |
-| `λ_uni` | 2 | 2 | 2 | 2 | 2 |
-| LoRA rank | 16 | 16 | 32 | 16 | 16 |
-| learning rate | 2e-4 | 2e-4 | 2e-4 | 2e-4 | 2e-4 |
-| weight averaging (decay) | 0.99 | 0.99 | 0.99 | – | 0.99 |
-| epochs | 30 | 15 | 30 | 30 | 20 |
-
-| LLM-Fusion, `--recipe selected` | CMU-MOSI | CMU-MOSEI | CH-SIMS | CH-SIMSv2 | IEMOCAP |
-|---|---|---|---|---|---|
-| LoRA rank | 32 | 32 | 16 | 16 | 32 |
-| learning rate | 2e-4 | 2e-4 | 1e-4 | 1e-4 | 2e-4 |
-| weight averaging (decay) | 0.99 | 0.99 | 0.99 | 0.99 | 0.99 |
-| epochs | 30 | 15 | 50 | 30 | 20 |
-
-`--recipe default` is the default recipe of the backbone for every row of the analyses (rank 16, lr 2e-4, no weight
-averaging; CoVeR: `τ = 0.3`, `λ_uni = 1`). Every hyper-parameter can be overridden on the command line
-(`python scripts/train.py -h`).
-
 ## Evaluation protocol
 
 * **Incomplete training.** A missing modality is unavailable both as an input and as a target. The main protocol draws
@@ -185,27 +156,6 @@ averaging; CoVeR: `τ = 0.3`, `λ_uni = 1`). Every hyper-parameter can be overri
   pooled over the seven sources.
 * **Seeds.** Means over three seeds for the comparisons with the state of the art and the diagnosis, over five seeds
   for the analyses of CoVeR.
-
-## Reproducing the experiments
-
-`bash scripts/run_paper.sh {main|analysis|permanent|tables}` runs the stages below for all datasets and seeds.
-
-| Experiment | Commands |
-|---|---|
-| Comparison under incomplete modalities, per-pattern and missing-rate results (LLM-Fusion, CoVeR) | `train.py --method {llm_fusion,cover}` (selected recipe, seeds 42–44), `make_tables.py` |
-| Correcting the collapse on MR-Bench-A: LLM-Fusion, discrepancy-gated steering, test-time override, learned reliability gate, conflict re-weighting, unimodal multi-task, CoVeR in accuracy and robust mode | default recipe, seeds 42–46: `train.py --method llm_fusion --recipe default`; `evaluate.py --steering`; `evaluate.py --tau_test 0.3`; `train.py --method learned_gate`; `train.py --method llm_fusion --recipe default --conflict_weight 5`; `train.py --method cover --recipe default --no_gate`; `train.py --method cover --recipe default` |
-| Supervision ablation on CH-SIMS | `train.py --dataset sims --method cover --recipe default --no_gate` (unimodal loss, no gate) and `train.py --dataset sims --method cover --recipe default` (CoVeR), seeds 42–46; the LLM-Fusion row is the three-seed reference of the comparison under incomplete modalities |
-| Test-time override sweep | `evaluate.py --run <LLM-Fusion run> --tau_test {0.5, 0.4, 0.3, 0.2, 0.1}` |
-| Scaling the LLM backbone | `train.py --dataset sims --method llm_fusion --recipe default --llm_path <LLM>` |
-| Where the decision collapses (reliance per layer, AUROC) | `diagnose.py --run <run>`, `plot_reliance.py` |
-| Permanent missingness | `train.py --missing permanent` (`permanent_incomplete`); expert judgments from the visible samples: `build_mrbench_a.py --missing permanent` |
-| IEMOCAP; MELD and MUStARD++ (sources of MR-Bench-H) | `extract_features.py --source {iemocap,meld,mustardpp}`, `preprocess.py`, `build_mrbench_a.py`, then `train.py` as above |
-| MR-Bench-H, fusion models | `predict_mrbench_h.py --run <run> --items <test.jsonl>` per source and seed (`--steering` for the state-steering comparator), then `score_mrbench_h.py` |
-| MR-Bench-H, zero-shot MLLMs | `eval_mllm.py --model <name> --model_path <path> --items <test.jsonl> --clips <clips>`, then `score_mrbench_h.py` |
-
-This repository contains the implementation of our method and analyses. The nine incomplete-multimodal-learning
-methods compared in the paper are ported from the authors' code and run under the same protocol (same frozen features,
-availability patterns and tests); these ports are not part of this repository.
 
 ## Citation
 
