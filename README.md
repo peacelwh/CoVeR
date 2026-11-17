@@ -7,6 +7,7 @@
 </p>
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2611.20349"><img src="https://img.shields.io/badge/arXiv-2611.20349-b31b1b" alt="arXiv: 2611.20349"></a>
   <a href="https://peacelwh.github.io/CoVeR/"><img src="https://img.shields.io/badge/Project-CoVeR-9cf" alt="Project page: CoVeR"></a>
   <a href="https://huggingface.co/datasets/Bluexxx/MR-Bench-H"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-MR--Bench--H-dfb317" alt="Dataset: MR-Bench-H"></a>
   <a href="https://huggingface.co/Bluexxx/CoVeR"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Checkpoints-CoVeR-dfb317" alt="Checkpoints: CoVeR"></a>
@@ -161,9 +162,10 @@ The paper reports means over three seeds; these checkpoints are the runs of seed
 
 ```bibtex
 @article{li2026words,
-  title  = {Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning},
-  author = {Li, Wenhao and Xiao, Chong and Bai, Xiaokun and He, Rundong and Qi, Zhuang and Liang, Xusheng and Wu, Zhibin and Wang, Qiangchang},
-  year   = {2026}
+  title   = {Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning},
+  author  = {Li, Wenhao and Xiao, Chong and Bai, Xiaokun and He, Rundong and Qi, Zhuang and Liang, Xusheng and Wu, Zhibin and Wang, Qiangchang},
+  journal = {arXiv preprint arXiv:2611.20349},
+  year    = {2026}
 }
 ```
 
