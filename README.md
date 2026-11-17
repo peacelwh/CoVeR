@@ -1,7 +1,7 @@
 <h1 align="center">Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning</h1>
 
 <p align="center">
-  Wenhao&nbsp;Li<sup>1,2</sup>, Chong&nbsp;Xiao<sup>1</sup>, Xiaokun&nbsp;Bai<sup>1</sup>, Rundong&nbsp;He<sup>3</sup>, Zhuang&nbsp;Qi<sup>4</sup>, Xusheng&nbsp;Liang<sup>5,2</sup>, Zhibin&nbsp;Wu<sup>1</sup>, Qiangchang&nbsp;Wang<sup>1</sup>
+  Qiangchang&nbsp;Wang<sup>1</sup>, Chong&nbsp;Xiao<sup>1</sup>, Xiaokun&nbsp;Bai<sup>1</sup>, Rundong&nbsp;He<sup>3</sup>, Zhuang&nbsp;Qi<sup>4</sup>, Xusheng&nbsp;Liang<sup>5,2</sup>, Zhibin&nbsp;Wu<sup>1</sup>, Wenhao&nbsp;Li<sup>1,2</sup>
   <br>
   <sup>1</sup>Shandong&nbsp;University &ensp; <sup>2</sup>Shenzhen&nbsp;Loop&nbsp;Area&nbsp;Institute &ensp; <sup>3</sup>The&nbsp;Hong&nbsp;Kong&nbsp;Polytechnic&nbsp;University &ensp; <sup>4</sup>National&nbsp;University&nbsp;of&nbsp;Singapore &ensp; <sup>5</sup>City&nbsp;University&nbsp;of&nbsp;Hong&nbsp;Kong
 </p>
@@ -161,9 +161,9 @@ The paper reports means over three seeds; these checkpoints are the runs of seed
 ## Citation
 
 ```bibtex
-@article{li2026words,
+@article{wang2026words,
   title   = {Words Speak Louder? Exploring the Language Shortcut of LLM-Driven Incomplete Multimodal Learning},
-  author  = {Li, Wenhao and Xiao, Chong and Bai, Xiaokun and He, Rundong and Qi, Zhuang and Liang, Xusheng and Wu, Zhibin and Wang, Qiangchang},
+  author  = {Wang, Qiangchang and Xiao, Chong and Bai, Xiaokun and He, Rundong and Qi, Zhuang and Liang, Xusheng and Wu, Zhibin and Li, Wenhao},
   journal = {arXiv preprint arXiv:2611.20349},
   year    = {2026}
 }
